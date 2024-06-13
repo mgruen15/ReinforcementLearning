@@ -150,15 +150,3 @@ class SnakeGameAI:
             y -= BLOCK_SIZE
 
         self.head = Point(x, y)
-
-if __name__ == '__main__':
-    game = SnakeGameAI()
-    while True:
-        # Example action: always go straight
-        action = [1, 0, 0]
-        reward, game_over, score = game.play_step(action)
-        if game_over:
-            break
-
-    print('Final Score:', score)
-    pygame.quit()
