@@ -1,4 +1,3 @@
-# This code implements the snake game. It is taken from https://github.com/patrickloeber/snake-ai-pytorch/blob/main/game.py
 import pygame
 import random
 from enum import Enum
@@ -6,8 +5,7 @@ from collections import namedtuple
 import numpy as np
 
 pygame.init()
-font = pygame.font.Font('arial.ttf', 25)
-#font = pygame.font.SysFont('arial', 25)
+font = pygame.font.SysFont('arial', 25)  # Changed to SysFont for better compatibility
 
 class Direction(Enum):
     RIGHT = 1
@@ -37,13 +35,13 @@ class SnakeGameAI:
         pygame.display.set_caption('Snake')
         self.clock = pygame.time.Clock()
         self.reset()
-
+        print("Game initialized")
 
     def reset(self):
         # init game state
         self.direction = Direction.RIGHT
 
-        self.head = Point(self.w/2, self.h/2) # snake starts in the middle
+        self.head = Point(self.w/2, self.h/2)  # snake starts in the middle
         self.snake = [self.head,
                       Point(self.head.x-BLOCK_SIZE, self.head.y),
                       Point(self.head.x-(2*BLOCK_SIZE), self.head.y)]
@@ -52,7 +50,7 @@ class SnakeGameAI:
         self.food = None
         self._place_food()
         self.frame_iteration = 0
-
+        print("Game state reset")
 
     def _place_food(self):
         # food gets placed randomly
@@ -61,7 +59,7 @@ class SnakeGameAI:
         self.food = Point(x, y)
         if self.food in self.snake:
             self._place_food()
-
+        print(f"Food placed at {self.food}")
 
     def play_step(self, action):
         self.frame_iteration += 1
@@ -72,7 +70,7 @@ class SnakeGameAI:
                 quit()
         
         # 2. move
-        self._move(action) # update the head
+        self._move(action)  # update the head
         self.snake.insert(0, self.head)
         
         # 3. check if game over
@@ -81,6 +79,7 @@ class SnakeGameAI:
         if self.is_collision() or self.frame_iteration > 100*len(self.snake):
             game_over = True
             reward = -10
+            print("Collision detected or frame limit exceeded")
             return reward, game_over, self.score
 
         # 4. place new food or just move
@@ -97,7 +96,6 @@ class SnakeGameAI:
         # 6. return game over and score
         return reward, game_over, self.score
 
-
     def is_collision(self, pt=None):
         if pt is None:
             pt = self.head
@@ -110,7 +108,6 @@ class SnakeGameAI:
 
         return False
 
-
     def _update_ui(self):
         self.display.fill(BLACK)
 
@@ -122,8 +119,7 @@ class SnakeGameAI:
 
         text = font.render("Score: " + str(self.score), True, WHITE)
         self.display.blit(text, [0, 0])
-        pygame.display.flip()
-
+        pygame.display.update()  # Ensure the display updates correctly
 
     def _move(self, action):
         # [straight, right, left]
@@ -132,13 +128,13 @@ class SnakeGameAI:
         idx = clock_wise.index(self.direction)
 
         if np.array_equal(action, [1, 0, 0]):
-            new_dir = clock_wise[idx] # no change
+            new_dir = clock_wise[idx]  # no change
         elif np.array_equal(action, [0, 1, 0]):
             next_idx = (idx + 1) % 4
-            new_dir = clock_wise[next_idx] # right turn r -> d -> l -> u
-        else: # [0, 0, 1]
+            new_dir = clock_wise[next_idx]  # right turn r -> d -> l -> u
+        else:  # [0, 0, 1]
             next_idx = (idx - 1) % 4
-            new_dir = clock_wise[next_idx] # left turn r -> u -> l -> d
+            new_dir = clock_wise[next_idx]  # left turn r -> u -> l -> d
 
         self.direction = new_dir
 
@@ -154,3 +150,15 @@ class SnakeGameAI:
             y -= BLOCK_SIZE
 
         self.head = Point(x, y)
+
+if __name__ == '__main__':
+    game = SnakeGameAI()
+    while True:
+        # Example action: always go straight
+        action = [1, 0, 0]
+        reward, game_over, score = game.play_step(action)
+        if game_over:
+            break
+
+    print('Final Score:', score)
+    pygame.quit()
