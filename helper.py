@@ -3,7 +3,8 @@ from IPython import display
 
 plt.ion()
 
-def plot(scores, mean_scores):
+
+def plot(scores, mean_scores, n_games):
     display.clear_output(wait=True)
     display.display(plt.gcf())
     plt.clf()
@@ -17,3 +18,7 @@ def plot(scores, mean_scores):
     plt.text(len(mean_scores)-1, mean_scores[-1], str(mean_scores[-1]))
     plt.show(block=False)
     plt.pause(.1)
+
+    if n_games % 10 == 0:
+        plt.savefig(f'./training_progress/training_progress_{n_games}.png')
+        print('Progress saved!')
