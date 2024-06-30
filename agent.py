@@ -9,6 +9,7 @@ from helper import plot
 MAX_MEMORY = 100000
 BATCH_SIZE = 1000
 LR = 0.001
+STEP_PENALTY = -0.01
 
 class Agent: 
     
@@ -116,6 +117,9 @@ def train():
         state_old = agent.get_state(game) # get the current state
         final_move = agent.get_action(state_old) # get the move
         reward, done, score = game.play_step(final_move) # perform move 
+                
+        reward += STEP_PENALTY # Apply step penalty
+
         state_new = agent.get_state(game) # get new state
 
         agent.train_short_memory(state_old, final_move, reward, state_new, done) # train short memory
