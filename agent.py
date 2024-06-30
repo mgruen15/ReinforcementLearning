@@ -6,9 +6,11 @@ from game import SnakeGameAI, Direction, Point
 from model import Linear_QNet, QTrainer
 from helper import plot 
 
+# This codebase is adapted from https://github.com/patrickloeber/snake-ai-pytorch
+
 MAX_MEMORY = 100000
 BATCH_SIZE = 1000
-LR = 0.001
+LR = 0.005
 STEP_PENALTY = -0.01
 
 class Agent: 
@@ -18,17 +20,10 @@ class Agent:
         self.epsilon = 0 # control randomness
         self.gamma = 0.9 # discount factor
         self.memory = deque(maxlen=MAX_MEMORY) # if we exceed memory, it will call popleft()
-        self.model = Linear_QNet(11, 256, 3) # eleven points of information for each state, output is 3 because we have three possible actions
+        self.model = Linear_QNet(11, 256, 128, 3) # eleven points of information for each state, output is 3 because we have three possible actions
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game):
-        ''' We choose 11 points of information that we retrieve for each state:
-        - danger straight/right/left
-        - direction left/right/up/down
-        - food left/right/up/down
-        
-        Every point of information is stored as a boolean value.'''
-
         head = game.snake[0] # get the head
 
         point_l = Point(head.x - 20, head.y) # check if there is danger around the head
@@ -85,7 +80,7 @@ class Agent:
         else:
             mini_sample = self.memory
 
-        states, actions, rewards, next_states, dones = zip(*mini_sample) # could also have been done in a forloop, but this is more elegant
+        states, actions, rewards, next_states, dones = zip(*mini_sample) # more elegant than a for loop
         self.trainer.train_step(states, actions, rewards, next_states, dones)
     
     def train_short_memory(self, state, action, reward, next_state, done):
@@ -93,13 +88,13 @@ class Agent:
 
     def get_action(self, state):
         # begin with random moves -> exploration, exploitation trade-off
-        self.epsilon = 80 - self.n_games # hyperparam, which can be changed
+        self.epsilon = 80 - self.n_games # hyperparameter, which can be changed
         final_move = [0,0,0]
         if random.randint(0,200) < self.epsilon:
             move = random.randint(0, 2) # do a random move -> exploration
             final_move[move] = 1 # save random choice in move parameter
         else:
-            state0 = torch.tensor(state, dtype=torch.float)
+            state0 = torch.tensor(state, dtype=torch.float) # exploitation
             prediction = self.model(state0)
             move = torch.argmax(prediction).item()
             final_move[move] = 1
@@ -113,9 +108,10 @@ def train():
     record = 0
     agent = Agent()
     game = SnakeGameAI()
+
     while True:
         state_old = agent.get_state(game) # get the current state
-        final_move = agent.get_action(state_old) # get the move
+        final_move = agent.get_action(state_old) # get the move from agent
         reward, done, score = game.play_step(final_move) # perform move 
                 
         reward += STEP_PENALTY # Apply step penalty
@@ -133,7 +129,7 @@ def train():
             agent.train_long_memory()
 
             if score > record:
-                record = score # if a new record has been reached, update the record
+                record = score # if a new record has been reached, update the record in the plot
                 agent.model.save()
             print(f"Game: {agent.n_games}, Score: {score}, Record: {record}")
             
@@ -141,7 +137,7 @@ def train():
             total_score += score
             mean_score = total_score / agent.n_games
             plot_mean_scores.append(mean_score)
-            plot(plot_scores, plot_mean_scores, agent.n_games)
+            plot(plot_scores, plot_mean_scores, agent.n_games, record)
 
 if __name__ == '__main__':
     train()

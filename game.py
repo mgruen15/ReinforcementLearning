@@ -4,6 +4,8 @@ from enum import Enum
 from collections import namedtuple
 import numpy as np
 
+# This codebase is taken from https://github.com/patrickloeber/snake-ai-pytorch
+
 pygame.init()
 font = pygame.font.SysFont('arial', 25)  # Changed to SysFont for better compatibility
 
@@ -23,7 +25,7 @@ BLUE2 = (0, 100, 255)
 BLACK = (0,0,0)
 
 BLOCK_SIZE = 20
-SPEED = 40
+SPEED = 100
 
 class SnakeGameAI:
 
