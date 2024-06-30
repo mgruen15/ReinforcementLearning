@@ -4,6 +4,8 @@ import torch.optim as optim
 import torch.nn.functional as F
 import os
 
+# This codebase is adapted from https://github.com/patrickloeber/snake-ai-pytorch
+
 class Linear_QNet(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
         super().__init__()
@@ -43,7 +45,7 @@ class QTrainer:
             next_state = torch.unsqueeze(next_state, 0)
             action = torch.unsqueeze(action, 0)
             reward = torch.unsqueeze(reward, 0)
-            done = (done, )
+            done = (done, ) # convert done to a tensor
         
         # predicted Q values with current state
         pred = self.model(state)
@@ -58,7 +60,9 @@ class QTrainer:
             target[idx][torch.argmax(action).item()] = Q_new
 
         self.optimizer.zero_grad()
-        loss = self.criterion(target, pred)
-        loss.backward()
 
-        self.optimizer.step()
+        loss = self.criterion(target, pred) # compute the loss between target and predicted Q-values
+
+        loss.backward() # backprop
+
+        self.optimizer.step() # update model parameters

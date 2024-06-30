@@ -20,7 +20,7 @@ class Agent:
         self.epsilon = 0 # control randomness
         self.gamma = 0.9 # discount factor
         self.memory = deque(maxlen=MAX_MEMORY) # if we exceed memory, it will call popleft()
-        self.model = Linear_QNet(11, 256, 128, 3) # eleven points of information for each state, output is 3 because we have three possible actions
+        self.model = Linear_QNet(11, 256, 3) # eleven points of information for each state, output is 3 because we have three possible actions
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game):
