@@ -1,6 +1,6 @@
 # SnaQe - A Q-Learning Network playing the mobile classic
 This repository is about training a reinforcement learning agent to play the mobile game Snake using a Q-Net. The result after training looks like this:
-!["Video"](./Trained_Agent_Run.gif)
+!["Video"](./videos/Trained_Agent_Run.gif)
 
 ## Table of Contents
 
