@@ -6,7 +6,7 @@ plt.ion()
 sns.set_theme(style='darkgrid')
 
 # Initialize the plot
-fig, ax = plt.subplots(figsize=(10, 6))
+fig, ax = plt.subplots(figsize=(6, 4))
 
 def plot(scores, mean_scores, n_games, record):
     display.clear_output(wait=True)
@@ -26,6 +26,6 @@ def plot(scores, mean_scores, n_games, record):
     display.display(fig)
     plt.pause(0.1)
 
-    if n_games % 10 == 0:
-        fig.savefig(f'./training_progress/plot_{n_games}.png', dpi=300)
-        print('Progress saved!')
+    # if n_games % 10 == 0:
+    #     fig.savefig(f'./training_progress/plot_{n_games}.png', dpi=300)
+    #     print('Progress saved!')
